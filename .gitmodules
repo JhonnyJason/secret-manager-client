@@ -1,0 +1,9 @@
+[submodule "toolset"]
+	path = toolset
+	url = git@github.com:JhonnyJason/toolset.git
+[submodule "sources"]
+	path = sources
+	url = git@github.com:JhonnyJason/secret-manager-client-sources.git
+[submodule "output"]
+	path = output
+	url = git@github.com:JhonnyJason/secret-manager-client-output.git

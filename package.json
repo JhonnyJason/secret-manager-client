@@ -1,0 +1,57 @@
+{
+    "name": "secret-manager-client",
+    "version": "0.0.1",
+    "description": "This is the shit!",
+    "scripts": {
+        "build-coffee": "coffee -o output/ -c sources/source/*/*.coffee",
+        "watch-coffee": "coffee -o output/ -cw sources/source/*/*.coffee",
+        "ncu-update": "ncu -u",
+        "reinstall": "npm install",
+        "update-packages": "run-s -ns ncu-update reinstall",
+        "module-gen": "thingy-module-gen --",
+        "sync-allmodules": "thingy-allmodules-sync --style require",
+        "add-module": "run-s -ns \"module-gen {*}\" sync-allmodules --",
+        "sourcemodulecreate": "cd sources/source && thingymodulecreate",
+        "use-sub-sourcemodule": "run-s \"sourcemodulecreate submodule,{1},use,{2}\"  --",
+        "merge-sub-sourcemodule": "run-s -ns  \"sourcemodulecreate submodule,{1},merge,{2}\"  --",
+        "merge-dir-sourcemodule": "run-s -ns  \"sourcemodulecreate directory,{1},merge,{2}\"  --",
+        "sourcemodule-to-sub": "run-s \"sourcemodulecreate submodule,{1}\" --",
+        "sourcemodule-to-dir": "run-s \"sourcemodulecreate directory,{1}\" --",
+        "push": "thingysync push --message",
+        "pull": "thingysync pull",
+        "postinstall": "npm run initialize-thingy",
+        "initialize-thingy": "run-s -ns build",
+        "build": "run-s -ns clean-package build-coffee copyscript install-node-modules",
+        "watch": "run-p -nsr watch-coffee",
+        "release": "run-s -ns build publish-script",
+        "package-update-release": "run-s -ns update-tools update-packages inc-versions update-cli-packages push release",
+        "inc-versions": "toolset/thingy-build-system/package/inc-versions.js",
+        "sync-versions": "toolset/thingy-build-system/package/sync-versions.js",
+        "update-tools": "toolset/thingy-build-system/package/update-tools.sh",
+        "update-package-packages": "toolset/thingy-build-system/package/update-packages.sh",
+        "publish-script": "toolset/thingy-build-system/package/publish-on-npm.sh",
+        "clean-package": "toolset/thingy-build-system/package/clean-package.sh",
+        "install-node-modules": "toolset/thingy-build-system/package/install-node-modules.sh",
+        "copyscript": "sources/ressources/copyscript.sh"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/JhonnyJason/secret-manager-client.git"
+    },
+    "author": "Lenard Frommelt",
+    "license": "Unlicense",
+    "bugs": {
+        "url": "https://github.com/JhonnyJason/secret-manager-client/issues"
+    },
+    "homepage": "https://github.com/JhonnyJason/secret-manager-client#readme",
+    "dependencies": {
+        "coffeescript": "^2.5.1",
+        "npm-check-updates": "^10.0.0",
+        "npm-run-all": "^4.1.5",
+        "thingy-allmodules-sync": "^0.1.3",
+        "thingy-module-gen": "^0.1.4",
+        "thingymodulecreate": "^0.1.8",
+        "thingysync": "^0.1.2"
+    },
+    "type": "package"
+}

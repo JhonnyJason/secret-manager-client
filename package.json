@@ -5,11 +5,14 @@
     "scripts": {
         "build-coffee": "coffee -o output/ -c sources/source/*/*.coffee",
         "watch-coffee": "coffee -o output/ -cw sources/source/*/*.coffee",
+        "build-live": "lsc -o output/ -c sources/source/*/*.ls",
+        "watch-live": "lsc -o output/ -cw sources/source/*/*.ls",
+        "link-all-js": "toolset/thingy-build-system/link-all-js.js",
         "ncu-update": "ncu -u",
         "reinstall": "npm install",
         "update-packages": "run-s -ns ncu-update reinstall",
         "module-gen": "thingy-module-gen --",
-        "sync-allmodules": "thingy-allmodules-sync --style require",
+        "sync-allmodules": "thingy-allmodules-sync",
         "add-module": "run-s -ns \"module-gen {*}\" sync-allmodules --",
         "sourcemodulecreate": "cd sources/source && thingymodulecreate",
         "use-sub-sourcemodule": "run-s \"sourcemodulecreate submodule,{1},use,{2}\"  --",
@@ -21,8 +24,9 @@
         "pull": "thingysync pull",
         "postinstall": "npm run initialize-thingy",
         "initialize-thingy": "run-s -ns build",
-        "build": "run-s -ns clean-package build-coffee copyscript install-node-modules",
-        "watch": "run-p -nsr watch-coffee",
+        "copy-all-js": "cp sources/source/*/*.js output/",
+        "build": "run-s -ns clean-package copy-all-js build-live build-coffee copyscript install-node-modules",
+        "watch": "run-p -nsr copy-all-js watch-live watch-coffee",
         "release": "run-s -ns build publish-script",
         "package-update-release": "run-s -ns update-tools update-packages inc-versions update-cli-packages push release",
         "inc-versions": "toolset/thingy-build-system/package/inc-versions.js",
@@ -45,13 +49,14 @@
     },
     "homepage": "https://github.com/JhonnyJason/secret-manager-client#readme",
     "dependencies": {
-        "coffeescript": "^2.6.1",
-        "npm-check-updates": "^12.5.9",
+        "coffeescript": "^2.7.0",
+        "livescript": "^1.6.0",
+        "npm-check-updates": "^16.0.5",
         "npm-run-all": "^4.1.5",
-        "thingy-allmodules-sync": "^0.1.4",
-        "thingy-module-gen": "^0.1.5",
+        "thingy-allmodules-sync": "^0.2.0",
+        "thingy-module-gen": "^0.1.6",
         "thingymodulecreate": "^0.1.8",
-        "thingysync": "^0.1.2"
-    },
-    "type": "package"
+        "thingysync": "^0.1.2",
+        "thingy-debug": "^0.0.1"
+    }
 }

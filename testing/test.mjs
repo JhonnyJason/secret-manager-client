@@ -11,9 +11,12 @@ async function run() {
 
     //test client creation
     const { cA, cB, cC } = await create3Clients()
-    log("Success: created the clients!")
+    log("> Success: created the clients!\n")
     await createClientInvalid()
-    log("Success: creating invalid Clients failed correctly!")
+    log("> Success: creating invalid Clients failed correctly!\n")
+
+    process.exit()
+
 
     const mySecret = "The world is mine!"
     //test setting and getting secret
@@ -169,42 +172,42 @@ async function createClientInvalid() {
     
     try { //the publicKey invalidA
         await fac.createClient(valid, invalidA, "https://localhost:6999")
-        log("Error: create client with publicKey invalidA did not throw an Exception!")
+        log("> Error: create client with publicKey invalidA did not throw an Exception!")
         die()
     } catch(error) {
-        log(error.message)
+        log('  - "' + error.message + '"')
         if(error.message ==  "Invalid key length!") {
-            log("Success: the publicKey invalidA threw correct error!")
+            log("  Success: the publicKey invalidA threw correct error!")
         } else {
-            log("Error: the publicKey invalidA throw wrong error!")
+            log("> Error: the publicKey invalidA throw wrong error!")
             die()
         }
     }
 
     try { //the publicKey invalidB
         await fac.createClient(valid, invalidB, "https://localhost:6999")
-        log("Error: create client with publicKey invalidB did not throw an Exception!")
+        log("> Error: create client with publicKey invalidB did not throw an Exception!")
         die()
     } catch(error) {
-        log(error.message)
+        log('  - "' + error.message + '"')
         if(error.message ==  "Non-hex character in key!") {
-            log("Success: the publicKey invalidB threw correct error!")
+            log("  Success: the publicKey invalidB threw correct error!")
         } else {
-            log("Error: the publicKey invalidB threw wrong error!")
+            log("> Error: the publicKey invalidB threw wrong error!")
             die()
         }
     }
 
     try { //the publicKey is nonfit
         await fac.createClient(valid, validB, "https://localhost:6999")
-        log("Error: create client with nonfit publicKey did not throw an Exception!")
+        log("> Error: create client with nonfit publicKey did not throw an Exception!")
         die()
     } catch(error) {
-        log(error.message)
+        log('  - "' + error.message + '"')
         if(error.message ==  "PublicKey does not fit secretKey!") {
-            log("Success: the nonfit publicKey threw correct error!")
+            log("  Success: the nonfit publicKey threw correct error!")
         } else {
-            log("Error: the nonfit publicKey threw wrong error!")
+            log("> Error: the nonfit publicKey threw wrong error!")
             die()
         }
     }

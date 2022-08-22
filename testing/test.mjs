@@ -153,12 +153,15 @@ async function getSecretSpaceFrom(client) {
 async function create3Clients() {
     log("-> create3Clients§")
     try {
-        var cA = await fac.createClient(null, null, "https://localhost:6999")
-        var cB = await fac.createClient(null, null, "https://localhost:6999")
-        var cC = await fac.createClient(null, null, "https://localhost:6999")
+        var serverURL = "https://localhost:6999"
+        var options = { serverURL }
+        var cA = fac.createClient(options)
+        var cB = fac.createClient(options)
+        var cC = fac.createClient(options)
+        await Promise.all([cA.ready, cB.ready, cC.ready])
         return {cA, cB, cC}
     } catch(error) {
-        log(error.message)
+        log('  > "'+error.message+'"')
         die()
     }
 }

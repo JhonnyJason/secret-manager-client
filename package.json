@@ -26,7 +26,7 @@
         "initialize-thingy": "run-s -ns build",
         "copy-all-js": "cp sources/source/*/*.js output/",
         "build": "run-s -ns clean-package copy-all-js build-live build-coffee copyscript install-node-modules",
-        "watch": "run-p -nsr copy-all-js watch-live watch-coffee",
+        "watch": "run-p -nsr watch-live watch-coffee",
         "release": "run-s -ns build publish-script",
         "package-update-release": "run-s -ns update-tools update-packages inc-versions update-cli-packages push release",
         "inc-versions": "toolset/thingy-build-system/package/inc-versions.js",

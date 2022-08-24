@@ -10,11 +10,17 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 async function run() {
 
     //test client creation
-    const { cA, cB, cC } = await create3Clients()
-    log("> Success: created the clients!\n")
+    await create1ReadyClient()
+    log("> Success: created 1 ready client!\n")
+    process.exit()
+
+    
+    // const { cA, cB, cC } = await create3Clients()
+    // log("> Success: created the clients!\n")
+    
+
     await createClientInvalid()
     log("> Success: creating invalid Clients failed correctly!\n")
-
     process.exit()
 
 
@@ -150,6 +156,20 @@ async function getSecretSpaceFrom(client) {
 }
 
 //==========================================================================
+async function create1ReadyClient() {
+    log("-> create1ReadyClient§")
+    try {
+        var serverURL = "https://localhost:6999"
+        var options = { serverURL }
+        var c = fac.createClient(options)
+        await c.ready
+    } catch(error) {
+        log('  > "'+error.message+'"')
+        die()
+    }
+}
+
+//==========================================================================
 async function create3Clients() {
     log("-> create3Clients§")
     try {
@@ -158,7 +178,7 @@ async function create3Clients() {
         var cA = fac.createClient(options)
         var cB = fac.createClient(options)
         var cC = fac.createClient(options)
-        await Promise.all([cA.ready, cB.ready, cC.ready])
+        await Promise.all([cA.ready, cB.ready, cC.ready]) 
         return {cA, cB, cC}
     } catch(error) {
         log('  > "'+error.message+'"')
@@ -172,9 +192,18 @@ async function createClientInvalid() {
     const validB = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
     const invalidA = "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbee"
     const invalidB = "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeez"
-    
+    const authCode = "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+
+    var serverURL = "https://localhost:6999"
+    var options = { serverURL, authCode }
+    options.secretKeyHex = valid
+
+
     try { //the publicKey invalidA
-        await fac.createClient(valid, invalidA, "https://localhost:6999")
+        options.publicKeyHex = invalidA
+        let c = fac.createClient(options)
+        console.log(c.ready)
+        await c.ready
         log("> Error: create client with publicKey invalidA did not throw an Exception!")
         die()
     } catch(error) {
@@ -188,7 +217,9 @@ async function createClientInvalid() {
     }
 
     try { //the publicKey invalidB
-        await fac.createClient(valid, invalidB, "https://localhost:6999")
+        options.publicKeyHex = invalidB
+        let c = fac.createClient(options)
+        await c.ready
         log("> Error: create client with publicKey invalidB did not throw an Exception!")
         die()
     } catch(error) {
@@ -202,7 +233,9 @@ async function createClientInvalid() {
     }
 
     try { //the publicKey is nonfit
-        await fac.createClient(valid, validB, "https://localhost:6999")
+        options.publicKeyHex = validB
+        let c =  fac.createClient(options)
+        await c.ready
         log("> Error: create client with nonfit publicKey did not throw an Exception!")
         die()
     } catch(error) {

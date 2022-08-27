@@ -18,13 +18,12 @@ async function run() {
     await setSecretFor(client, "super-secret", "I actually don't know it myself.")
     
     await printSecretSpaceFor(client)
-    
+
     await client.eraseFromServer()
     log("> Success: deleted the 1 client!\n")
 
     await printSecretSpaceFor(client)
-    process.exit()
-
+    
 
     // const { cA, cB, cC } = await create3Clients()
     // log("> Success: created the clients!\n")

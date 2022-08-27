@@ -14,12 +14,11 @@ async function run() {
     log("> Success: created 1 ready client!\n")
     
     await printSecretSpaceFor(client)
-    process.exit()
 
     await setSecretFor(client, "super-secret", "I actually don't know it myself.")
     
     await printSecretSpaceFor(client)
-
+    
     await client.eraseFromServer()
     log("> Success: deleted the 1 client!\n")
 

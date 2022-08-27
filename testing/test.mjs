@@ -10,11 +10,23 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 async function run() {
 
     //test client creation
-    await create1ReadyClient()
+    var client = await create1ReadyClient()
     log("> Success: created 1 ready client!\n")
+    
+    await printSecretSpaceFor(client)
     process.exit()
 
+    await setSecretFor(client, "super-secret", "I actually don't know it myself.")
     
+    await printSecretSpaceFor(client)
+
+    await client.eraseFromServer()
+    log("> Success: deleted the 1 client!\n")
+
+    await printSecretSpaceFor(client)
+    process.exit()
+
+
     // const { cA, cB, cC } = await create3Clients()
     // log("> Success: created the clients!\n")
     
@@ -156,6 +168,18 @@ async function getSecretSpaceFrom(client) {
 }
 
 //==========================================================================
+async function printSecretSpaceFor(client) {
+    log("-> printSecretSpaceFor§")
+    try {
+        var space = await client.getSecretSpace()
+        olog(space)
+    } catch(error) {
+        log(error.message)
+        return
+    }
+}
+
+//==========================================================================
 async function create1ReadyClient() {
     log("-> create1ReadyClient§")
     try {
@@ -163,6 +187,7 @@ async function create1ReadyClient() {
         var options = { serverURL }
         var c = fac.createClient(options)
         await c.ready
+        return c
     } catch(error) {
         log('  > "'+error.message+'"')
         die()

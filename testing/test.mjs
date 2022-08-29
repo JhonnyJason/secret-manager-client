@@ -9,94 +9,114 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 //==========================================================================
 async function run() {
 
-    //test client creation
-    var client = await create1ReadyClient()
-    log("> Success: created 1 ready client!\n")
-    
-    await printSecretSpaceFor(client)
 
-    await setSecretFor(client, "super-secret", "I actually don't know it myself.")
-    
-    await printSecretSpaceFor(client)
+    // testing all simple usecases
+    // var client = null;
+    // //test client creation
+    // client = await create1ReadyClient()
+    // await printSecretSpaceFor(client)
+    // // process.exit()
 
-    await client.eraseFromServer()
-    log("> Success: deleted the 1 client!\n")
+    // var secretId = "super-secret"
+    // await setSecretFor(client, secretId, "I actually don't know it myself.")
+    // await printSecretSpaceFor(client)
+    // await printSecretFor(client, secretId)
+    // // process.exit()
 
-    await printSecretSpaceFor(client)
-    
+    // await deleteSecretFor(client, secretId)
+    // await printSecretSpaceFor(client)
+    // await printSecretFor(client, secretId)
 
-    // const { cA, cB, cC } = await create3Clients()
-    // log("> Success: created the clients!\n")
-    
+    // await client.eraseFromServer()
+    // await printSecretSpaceFor(client)
+    // // process.exit()    
 
-    await createClientInvalid()
-    log("> Success: creating invalid Clients failed correctly!\n")
-    process.exit()
+    // await createClientInvalid()
+    // log("> Success: creating invalid Clients failed correctly!\n")
+    // process.exit()
 
 
-    const mySecret = "The world is mine!"
+    const { cA, cB, cC } = await create3Clients()
+    log("> Success: created the 3 clients!\n")
+
+    var mySecret = "The world is mine!"
     //test setting and getting secret
-    await setSecretFor(cA, "mySecret", mySecret)
-    await setSecretFor(cB, "mySecret", mySecret)
-    await setSecretFor(cC, "mySecret", mySecret)
-
-    const secretA = await getSecretFrom(cA, "mySecret")
-    const secretB = await getSecretFrom(cB, "mySecret")
-    const secretC = await getSecretFrom(cC, "mySecret")
-
-    if(secretA == mySecret && secretB == mySecret && secretC == mySecret) {
-        log("Success: set and retrieved the secrets.")
-    }else {
-        log("Error: Retrieved secret did not match stored secret")
-        die()
-    }
-
-    //test creating same client with the keys
-    const secretKey = cA.secretKeyHex
-    const publicKey = cA.publicKeyHex
-    const sameClient = await fac.createClient(secretKey, publicKey, "https://localhost:6999")
-    log("Success: created the same client!")
-
-    //test retrieving the same secret of the same client
-    const sameRetrievedSecret = await getSecretFrom(sameClient, "mySecret")
+    // await setSecretFor(cA, "mySecret", mySecret)
+    await cA.acceptSecretsFrom(cB.id)
+    await printSecretSpaceFor(cA)
+    process.exit()
     
-    if(mySecret == sameRetrievedSecret) {
-        log("Success: retrieved same secret!")
-    } else {
-        log("Error: Same retrieved secret did not match stored secret")
-        die()
-    }
+
+    // await setSecretFor(cB, "mySecret", mySecret)
+    // await setSecretFor(cC, "mySecret", mySecret)
+
+    // const secretA = await getSecretFrom(cA, "mySecret")
+    // const secretB = await getSecretFrom(cB, "mySecret")
+    // const secretC = await getSecretFrom(cC, "mySecret")
 
 
-    //test getting secret space
-    const secretSpace = await getSecretSpaceFrom(cA)
-    const spaceKeys = Object.keys(secretSpace)
+    // const mySecret = "The world is mine!"
+    // //test setting and getting secret
+    // await setSecretFor(cA, "mySecret", mySecret)
+    // await setSecretFor(cB, "mySecret", mySecret)
+    // await setSecretFor(cC, "mySecret", mySecret)
 
-    log(spaceKeys)
-    if(spaceKeys.includes("mySecret")) {
-        log("Success: retrieved the secretSpace")
-    } else {
-        log("Error: Retrieved secretSpace did not contain mySecret!")
-        die()
-    }
+    // const secretA = await getSecretFrom(cA, "mySecret")
+    // const secretB = await getSecretFrom(cB, "mySecret")
+    // const secretC = await getSecretFrom(cC, "mySecret")
 
-    //test deleting secret
-    await deleteSecretFor(cA,"mySecret")
-    const secretSpaceDeleted = await getSecretSpaceFrom(cA)
-    const spaceKeysDeleted = Object.keys(secretSpaceDeleted)
+    // if(secretA == mySecret && secretB == mySecret && secretC == mySecret) {
+    //     log("Success: set and retrieved the secrets.")
+    // } else {
+    //     log("Error: Retrieved secret did not match stored secret")
+    //     die()
+    // }
 
-    log(spaceKeysDeleted)
-    if(spaceKeysDeleted.includes("mySecret")) {
-        log("Error: mySecret was still available after deleting!")
-        die()
-    } else {
-        log("Success: deleted mySecret!")
-    }
-    const missingSecret = await getSecretSpaceFrom(cA, "mySecret") 
+    // //test creating same client with the keys
+    // const secretKey = cA.secretKeyHex
+    // const publicKey = cA.publicKeyHex
+    // const sameClient = await fac.createClient(secretKey, publicKey, "https://localhost:6999")
+    // log("Success: created the same client!")
+
+    // //test retrieving the same secret of the same client
+    // const sameRetrievedSecret = await getSecretFrom(sameClient, "mySecret")
+    
+    // if(mySecret == sameRetrievedSecret) {
+    //     log("Success: retrieved same secret!")
+    // } else {
+    //     log("Error: Same retrieved secret did not match stored secret")
+    //     die()
+    // }
+
+    // //test getting secret space
+    // const secretSpace = await getSecretSpaceFrom(cA)
+    // const spaceKeys = Object.keys(secretSpace)
+
+    // log(spaceKeys)
+    // if(spaceKeys.includes("mySecret")) {
+    //     log("Success: retrieved the secretSpace")
+    // } else {
+    //     log("Error: Retrieved secretSpace did not contain mySecret!")
+    //     die()
+    // }
+
+    // //test deleting secret
+    // await deleteSecretFor(cA,"mySecret")
+    // const secretSpaceDeleted = await getSecretSpaceFrom(cA)
+    // const spaceKeysDeleted = Object.keys(secretSpaceDeleted)
+
+    // log(spaceKeysDeleted)
+    // if(spaceKeysDeleted.includes("mySecret")) {
+    //     log("Error: mySecret was still available after deleting!")
+    //     die()
+    // } else {
+    //     log("Success: deleted mySecret!")
+    // }
+    // const missingSecret = await getSecretSpaceFrom(cA, "mySecret") 
 
 
-    //test removing nodeId for client
-    await eraseClient(cC)
+    // //test removing nodeId for client
+    // await eraseClient(cC)
 
 
 
@@ -178,6 +198,18 @@ async function printSecretSpaceFor(client) {
 }
 
 //==========================================================================
+async function printSecretFor(client, secretId) {
+    log("-> printSecretFor§")
+    try {
+        var secret = await client.getSecret(secretId)
+        log(secret)
+    } catch(error) {
+        log(error.message)
+        return
+    }
+}
+
+//==========================================================================
 async function create1ReadyClient() {
     log("-> create1ReadyClient§")
     try {
@@ -230,13 +262,8 @@ async function createClientInvalid() {
         log("> Error: create client with publicKey invalidA did not throw an Exception!")
         die()
     } catch(error) {
+        log('  we used invalid key length and got an error')
         log('  - "' + error.message + '"')
-        if(error.message ==  "Invalid key length!") {
-            log("  Success: the publicKey invalidA threw correct error!")
-        } else {
-            log("> Error: the publicKey invalidA throw wrong error!")
-            die()
-        }
     }
 
     try { //the publicKey invalidB
@@ -246,13 +273,8 @@ async function createClientInvalid() {
         log("> Error: create client with publicKey invalidB did not throw an Exception!")
         die()
     } catch(error) {
-        log('  - "' + error.message + '"')
-        if(error.message ==  "Non-hex character in key!") {
-            log("  Success: the publicKey invalidB threw correct error!")
-        } else {
-            log("> Error: the publicKey invalidB threw wrong error!")
-            die()
-        }
+        log('  we used non-hex-charcters and got an error')
+        log('  - "' + error.message + '"')        
     }
 
     try { //the publicKey is nonfit
@@ -262,13 +284,8 @@ async function createClientInvalid() {
         log("> Error: create client with nonfit publicKey did not throw an Exception!")
         die()
     } catch(error) {
+        log('  we used deadbeef for pub and secret key and got an error')
         log('  - "' + error.message + '"')
-        if(error.message ==  "PublicKey does not fit secretKey!") {
-            log("  Success: the nonfit publicKey threw correct error!")
-        } else {
-            log("> Error: the nonfit publicKey threw wrong error!")
-            die()
-        }
     }
     
 

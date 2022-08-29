@@ -44,6 +44,24 @@ async function run() {
     // await setSecretFor(cA, "mySecret", mySecret)
     await cA.acceptSecretsFrom(cB.id)
     await printSecretSpaceFor(cA)
+    // process.exit()
+
+    await cA.stopAcceptSecretsFrom(cB.id)
+    await printSecretSpaceFor(cA)
+    // process.exit()
+
+    await cA.acceptSecretsFrom(cC.id)
+    await cC.shareSecretTo(cA.id, "mySecret", mySecret)
+    await printSecretSpaceFor(cA)
+
+    var retrievedSecret = await cA.getSecretFrom(cC.id, "mySecret")
+    console.log(retrievedSecret)
+    await cC.deleteSharedSecret(cA.id, "mySecret")
+    await printSecretSpaceFor(cA)
+
+    retrievedSecret = await cA.getSecretFrom(cC.id, "mySecret")
+    console.log(retrievedSecret)
+    
     process.exit()
     
 

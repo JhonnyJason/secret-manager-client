@@ -10,6 +10,10 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 async function run() {
 
 
+    // await testNotificationHooks()
+    await testNotificationHooksSubSpace()
+    process.exit()
+
     // testing all simple usecases
     // var client = null;
     // //test client creation
@@ -29,7 +33,7 @@ async function run() {
 
     // await client.eraseFromServer()
     // await printSecretSpaceFor(client)
-    // // process.exit()    
+    // process.exit()    
 
     // await createClientInvalid()
     // log("> Success: creating invalid Clients failed correctly!\n")
@@ -46,23 +50,23 @@ async function run() {
     await printSecretSpaceFor(cA)
     // process.exit()
 
-    await cA.stopAcceptSecretsFrom(cB.id)
+    await cA.stopAcceptingSecretsFrom(cB.id)
     await printSecretSpaceFor(cA)
-    // process.exit()
-
-    await cA.acceptSecretsFrom(cC.id)
-    await cC.shareSecretTo(cA.id, "mySecret", mySecret)
-    await printSecretSpaceFor(cA)
-
-    var retrievedSecret = await cA.getSecretFrom(cC.id, "mySecret")
-    console.log(retrievedSecret)
-    await cC.deleteSharedSecret(cA.id, "mySecret")
-    await printSecretSpaceFor(cA)
-
-    retrievedSecret = await cA.getSecretFrom(cC.id, "mySecret")
-    console.log(retrievedSecret)
-    
     process.exit()
+
+    // await cA.acceptSecretsFrom(cC.id)
+    // await cC.shareSecretTo(cA.id, "mySecret", mySecret)
+    // await printSecretSpaceFor(cA)
+
+    // var retrievedSecret = await cA.getSecretFrom(cC.id, "mySecret")
+    // console.log(retrievedSecret)
+    // await cC.deleteSharedSecret(cA.id, "mySecret")
+    // await printSecretSpaceFor(cA)
+
+    // retrievedSecret = await cA.getSecretFrom(cC.id, "mySecret")
+    // console.log(retrievedSecret)
+    
+    // process.exit()
     
 
     // await setSecretFor(cB, "mySecret", mySecret)
@@ -153,11 +157,109 @@ async function run() {
 
 
 }
+//==========================================================================
+//#region testcase
+async function testNotificationHooksSubSpace() {
+    var client = null;
+    var sharer = null;
+    
+    client = await create1ReadyClient()
+    sharer = await create1ReadyClient()
 
+    await client.acceptSecretsFrom(sharer.id)
+
+    await sharer.shareSecretTo(client, "sharedSecret", "Super Secret")
+    
+    var type = "log"
+    var targetId = "subSpaces."+sharer.id
+    var notifyURL = "https://citysearch.weblenny.at/citysearch"
+
+    var addResponse = await client.addNotificationHook(type, targetId, notifyURL)
+    olog({addResponse})
+    
+    var id1 = addResponse.notificationHookId
+
+    type = "event onDelete"
+    targetId = "subSpaces."+sharer.id+".sharedSecret"
+    notifyURL = "https://citysearch.weblenny.at/citysearch"
+
+    addResponse = await client.addNotificationHook(type, targetId, notifyURL)
+    olog({addResponse})
+    
+    var id2 = addResponse.notificationHookId
+
+    var deleteResponse = await client.deleteNotificationHook(id1)
+    olog({deleteResponse})
+
+    deleteResponse = await client.deleteNotificationHook(id2)
+    olog({deleteResponse})
+
+    await printSecretSpaceFor(client)
+    
+}
+
+async function testNotificationHooks() {
+    var client = null;
+    
+    client = await create1ReadyClient()
+
+    var type = "log"
+    var targetId = "this"
+    var notifyURL = "https://citysearch.weblenny.at/citysearch"
+    
+    var addResponse = await client.addNotificationHook(type, targetId, notifyURL)
+    olog({addResponse})
+    
+    var id1 = addResponse.notificationHookId
+
+    notifyURL = "https://citysearch.weblenny.at/stringsearch"
+    addResponse = await client.addNotificationHook(type, targetId, notifyURL)
+    olog({addResponse})
+    var id2 = addResponse.notificationHookId
+
+    var getResponse = await client.getNotificationHooks(targetId)
+    olog({getResponse})
+
+    type = "event onSet"
+    targetId = "secrets.notifyOnSet"
+    notifyURL = "https://citysearch.weblenny.at/stringsearch"
+
+    await setSecretFor(client, "notifyOnSet", "I will notify on set :-)")
+    addResponse = await client.addNotificationHook(type, targetId, notifyURL)
+    olog({addResponse})
+    var id3 = addResponse.notificationHookId
+
+    await printSecretSpaceFor(client)
+    
+    getResponse = await client.getNotificationHooks(targetId)
+    olog({getResponse})
+
+
+    var deleteResponse = await client.deleteNotificationHook(id1)
+    olog({deleteResponse})
+
+    deleteResponse = await client.deleteNotificationHook(id2)
+    olog({deleteResponse})
+
+    deleteResponse = await client.deleteNotificationHook(id3)
+    olog({deleteResponse})
+
+    await printSecretSpaceFor(client)
+
+}
+
+//#endregion
+
+//==========================================================================
+//#region helper functions
 //==========================================================================
 function die() {
     log("Critical Error -> controlled death commencing!")
     process.exit()
+}
+
+async function waitMS(ms) {
+    await  new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 //==========================================================================
@@ -319,7 +421,7 @@ async function eraseClient(client) {
     }
 }
 
-
+//#endregion
 
 //==========================================================================
 run()

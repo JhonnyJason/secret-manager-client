@@ -10,8 +10,11 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 async function run() {
 
 
+    await testGetNodeId()
+
     // await testNotificationHooks()
-    await testNotificationHooksSubSpace()
+    // await testNotificationHooksSubSpace()
+
     process.exit()
 
     // testing all simple usecases
@@ -248,6 +251,19 @@ async function testNotificationHooks() {
 
 }
 
+async function testGetNodeId() {
+    var client = null;
+    
+    var wrongAuthCode = "deadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabb"
+    var invalidAuthCode = "asd"
+    var correctAuthCode = "deadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabe"
+    
+    
+    client = await create1ReadyClient()
+    var serverId = await client.getServerId(correctAuthCode)
+    
+    log("Succes: getServerId returned "+serverId)
+}
 //#endregion
 
 //==========================================================================

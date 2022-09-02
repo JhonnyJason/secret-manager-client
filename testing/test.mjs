@@ -10,7 +10,8 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 async function run() {
 
 
-    await testGetNodeId()
+    await testClosureDates()
+    // await testGetNodeId()
 
     // await testNotificationHooks()
     // await testNotificationHooksSubSpace()
@@ -21,21 +22,21 @@ async function run() {
     // var client = null;
     // //test client creation
     // client = await create1ReadyClient()
-    // await printSecretSpaceFor(client)
+    // await tryPrintingSecretSpaceFor(client)
     // // process.exit()
 
     // var secretId = "super-secret"
     // await setSecretFor(client, secretId, "I actually don't know it myself.")
-    // await printSecretSpaceFor(client)
+    // await tryPrintingSecretSpaceFor(client)
     // await printSecretFor(client, secretId)
     // // process.exit()
 
     // await deleteSecretFor(client, secretId)
-    // await printSecretSpaceFor(client)
+    // await tryPrintingSecretSpaceFor(client)
     // await printSecretFor(client, secretId)
 
     // await client.eraseFromServer()
-    // await printSecretSpaceFor(client)
+    // await tryPrintingSecretSpaceFor(client)
     // process.exit()    
 
     // await createClientInvalid()
@@ -50,21 +51,21 @@ async function run() {
     //test setting and getting secret
     // await setSecretFor(cA, "mySecret", mySecret)
     await cA.acceptSecretsFrom(cB.id)
-    await printSecretSpaceFor(cA)
+    await tryPrintingSecretSpaceFor(cA)
     // process.exit()
 
     await cA.stopAcceptingSecretsFrom(cB.id)
-    await printSecretSpaceFor(cA)
+    await tryPrintingSecretSpaceFor(cA)
     process.exit()
 
     // await cA.acceptSecretsFrom(cC.id)
     // await cC.shareSecretTo(cA.id, "mySecret", mySecret)
-    // await printSecretSpaceFor(cA)
+    // await tryPrintingSecretSpaceFor(cA)
 
     // var retrievedSecret = await cA.getSecretFrom(cC.id, "mySecret")
     // console.log(retrievedSecret)
     // await cC.deleteSharedSecret(cA.id, "mySecret")
-    // await printSecretSpaceFor(cA)
+    // await tryPrintingSecretSpaceFor(cA)
 
     // retrievedSecret = await cA.getSecretFrom(cC.id, "mySecret")
     // console.log(retrievedSecret)
@@ -162,6 +163,15 @@ async function run() {
 }
 //==========================================================================
 //#region testcase
+async function testClosureDates() {
+    var client = null;
+    var closureDateNow = Date.now()
+    
+    client = await tryCreating1ReadyClientWithClosureDate(closureDateNow)
+    await tryPrintingSecretSpaceFor(client)
+    
+}
+
 async function testNotificationHooksSubSpace() {
     var client = null;
     var sharer = null;
@@ -197,7 +207,7 @@ async function testNotificationHooksSubSpace() {
     deleteResponse = await client.deleteNotificationHook(id2)
     olog({deleteResponse})
 
-    await printSecretSpaceFor(client)
+    await tryPrintingSecretSpaceFor(client)
     
 }
 
@@ -232,7 +242,7 @@ async function testNotificationHooks() {
     olog({addResponse})
     var id3 = addResponse.notificationHookId
 
-    await printSecretSpaceFor(client)
+    await tryPrintingSecretSpaceFor(client)
     
     getResponse = await client.getNotificationHooks(targetId)
     olog({getResponse})
@@ -247,7 +257,7 @@ async function testNotificationHooks() {
     deleteResponse = await client.deleteNotificationHook(id3)
     olog({deleteResponse})
 
-    await printSecretSpaceFor(client)
+    await tryPrintingSecretSpaceFor(client)
 
 }
 
@@ -322,8 +332,8 @@ async function getSecretSpaceFrom(client) {
 }
 
 //==========================================================================
-async function printSecretSpaceFor(client) {
-    log("-> printSecretSpaceFor§")
+async function tryPrintingSecretSpaceFor(client) {
+    log("-> tryPrintingSecretSpaceFor§")
     try {
         var space = await client.getSecretSpace()
         olog(space)
@@ -357,6 +367,20 @@ async function create1ReadyClient() {
     } catch(error) {
         log('  > "'+error.message+'"')
         die()
+    }
+}
+
+//==========================================================================
+async function tryCreating1ReadyClientWithClosureDate(closureDate) {
+    log("-> tryCreate1ReadyClientWithClosureDate§")
+    try {
+        var serverURL = "https://localhost:6999"
+        var options = { serverURL, closureDate }
+        var c = fac.createClient(options)
+        await c.ready
+        return c
+    } catch(error) {
+        log('  > "'+error.message+'"')
     }
 }
 

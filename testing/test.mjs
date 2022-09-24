@@ -9,8 +9,8 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 //==========================================================================
 async function run() {
 
-
-    await testClosureDates()
+    await testAuthCodes()
+    // await testClosureDates()
     // await testGetNodeId()
 
     // await testNotificationHooks()
@@ -163,21 +163,54 @@ async function run() {
 }
 //==========================================================================
 //#region testcase
+async function testAuthCodes() {
+    var client = null;
+    var publicAuthCode = "deadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabe"
+    var serverId = null
+    var authCode = null
+    var closureDate = Date.now() + (1000 * 10)
+
+
+    client = await create1ReadyClient(closureDate)
+
+    serverId = await client.getServerId(publicAuthCode)
+
+    log("returned Server Id: " + serverId)
+
+    await client.acceptSecretsFrom(serverId)
+    await client.generateAuthCodeFor("openSecretSpace")
+    authCode = await client.getSecretFrom(serverId, "openSecretSpaceAuthCode")    
+    olog({authCode})
+
+    client = await create1ReadyClient(closureDate, authCode)
+    await tryPrintingSecretSpaceFor(client)
+
+}
+
 async function testClosureDates() {
     var client = null;
     var closureDateNow = Date.now()
-    
+    var closureDatePlus15S = closureDateNow + (1000 * 15)
+
     client = await tryCreating1ReadyClientWithClosureDate(closureDateNow)
-    await tryPrintingSecretSpaceFor(client)
+    // await tryPrintingSecretSpaceFor(client)
     
+    client = await tryCreating1ReadyClientWithClosureDate(closureDatePlus15S)
+    await tryPrintingSecretSpaceFor(client)
+
+    await waitMS(17000)
+    await tryPrintingSecretSpaceFor(client)
+
 }
 
 async function testNotificationHooksSubSpace() {
     var client = null;
     var sharer = null;
-    
-    client = await create1ReadyClient()
-    sharer = await create1ReadyClient()
+
+    var closureDate = Date.now() + (1000 * 10)
+
+    client = await create1ReadyClient(closureDate)
+    sharer = await create1ReadyClient(closureDate)
 
     await client.acceptSecretsFrom(sharer.id)
 
@@ -190,7 +223,7 @@ async function testNotificationHooksSubSpace() {
     var addResponse = await client.addNotificationHook(type, targetId, notifyURL)
     olog({addResponse})
     
-    var id1 = addResponse.notificationHookId
+    var id1 = addResponse.id
 
     type = "event onDelete"
     targetId = "subSpaces."+sharer.id+".sharedSecret"
@@ -199,7 +232,7 @@ async function testNotificationHooksSubSpace() {
     addResponse = await client.addNotificationHook(type, targetId, notifyURL)
     olog({addResponse})
     
-    var id2 = addResponse.notificationHookId
+    var id2 = addResponse.id
 
     var deleteResponse = await client.deleteNotificationHook(id1)
     olog({deleteResponse})
@@ -213,8 +246,9 @@ async function testNotificationHooksSubSpace() {
 
 async function testNotificationHooks() {
     var client = null;
-    
-    client = await create1ReadyClient()
+    var closureDate = Date.now() + (1000 * 10)
+
+    client = await create1ReadyClient(closureDate)
 
     var type = "log"
     var targetId = "this"
@@ -223,12 +257,12 @@ async function testNotificationHooks() {
     var addResponse = await client.addNotificationHook(type, targetId, notifyURL)
     olog({addResponse})
     
-    var id1 = addResponse.notificationHookId
+    var id1 = addResponse.id
 
     notifyURL = "https://citysearch.weblenny.at/stringsearch"
     addResponse = await client.addNotificationHook(type, targetId, notifyURL)
     olog({addResponse})
-    var id2 = addResponse.notificationHookId
+    var id2 = addResponse.id
 
     var getResponse = await client.getNotificationHooks(targetId)
     olog({getResponse})
@@ -240,13 +274,12 @@ async function testNotificationHooks() {
     await setSecretFor(client, "notifyOnSet", "I will notify on set :-)")
     addResponse = await client.addNotificationHook(type, targetId, notifyURL)
     olog({addResponse})
-    var id3 = addResponse.notificationHookId
+    var id3 = addResponse.id
 
     await tryPrintingSecretSpaceFor(client)
     
     getResponse = await client.getNotificationHooks(targetId)
     olog({getResponse})
-
 
     var deleteResponse = await client.deleteNotificationHook(id1)
     olog({deleteResponse})
@@ -263,13 +296,14 @@ async function testNotificationHooks() {
 
 async function testGetNodeId() {
     var client = null;
-    
+    var closureDate = Date.now() + (1000 * 10)
+
     var wrongAuthCode = "deadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabb"
     var invalidAuthCode = "asd"
     var correctAuthCode = "deadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabe"
     
     
-    client = await create1ReadyClient()
+    client = await create1ReadyClient(closureDate)
     var serverId = await client.getServerId(correctAuthCode)
     
     log("Succes: getServerId returned "+serverId)
@@ -356,12 +390,18 @@ async function printSecretFor(client, secretId) {
 }
 
 //==========================================================================
-async function create1ReadyClient() {
+async function create1ReadyClient(closureDate, authCode) {
     log("-> create1ReadyClient§")
     try {
         var serverURL = "https://localhost:6999"
         var options = { serverURL }
-        var c = fac.createClient(options)
+
+        if(closureDate)
+            options.closureDate = closureDate
+        if(authCode)
+            options.authCode = authCode
+
+            var c = fac.createClient(options)
         await c.ready
         return c
     } catch(error) {

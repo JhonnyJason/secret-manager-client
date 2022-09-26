@@ -9,11 +9,11 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 //==========================================================================
 async function run() {
 
-    await testAuthCodes()
+    // await testAuthCodes()
     // await testClosureDates()
     // await testGetNodeId()
 
-    // await testNotificationHooks()
+    await testNotificationHooks()
     // await testNotificationHooksSubSpace()
 
     process.exit()

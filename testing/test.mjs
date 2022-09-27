@@ -13,7 +13,8 @@ async function run() {
     // await testClosureDates()
     // await testGetNodeId()
 
-    await testNotificationHooks1()
+    // await testNotificationHooks1()
+    await testNotificationHooksAll()
     // await testNotificationHooksSubSpace()
 
     process.exit()

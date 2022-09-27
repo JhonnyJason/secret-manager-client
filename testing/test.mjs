@@ -13,7 +13,7 @@ async function run() {
     // await testClosureDates()
     // await testGetNodeId()
 
-    await testNotificationHooks()
+    await testNotificationHooks1()
     // await testNotificationHooksSubSpace()
 
     process.exit()
@@ -155,12 +155,13 @@ async function run() {
 
     // test retrieving the shared secret from other client
 
-
-
-
-
-
 }
+
+
+
+
+
+
 //==========================================================================
 //#region testcase
 async function testAuthCodes() {
@@ -244,9 +245,23 @@ async function testNotificationHooksSubSpace() {
     
 }
 
-async function testNotificationHooks() {
+async function testNotificationHooks1() {
     var client = null;
-    var closureDate = Date.now() + (1000 * 10)
+    var closureDate = Date.now() + (1000 * 20)
+
+    client = await create1ReadyClient(closureDate)
+
+    var type = "log"
+    var targetId = "this"
+    var notifyURL = "https://citysearch.weblenny.at/citysearch"
+    
+    var addResponse = await client.addNotificationHook(type, targetId, notifyURL)
+    olog({addResponse})
+}
+
+async function testNotificationHooksAll() {
+    var client = null;
+    var closureDate = Date.now() + (1000 * 30)
 
     client = await create1ReadyClient(closureDate)
 

@@ -10,12 +10,16 @@ function olog(arg) { log(JSON.stringify(arg, null, 4)) }
 async function run() {
 
     // await testAuthCodes()
-    // await testClosureDates()
+    // await testClosureSimple()
+    // await testClosureDateMany()
+    await testClosureDateSubSpace()
     // await testGetNodeId()
 
     // await testNotificationHooks1()
-    await testNotificationHooksAll()
+    // await testNotificationHooksAll()
     // await testNotificationHooksSubSpace()
+    
+    // await testSecretSharing()
 
     process.exit()
 
@@ -189,7 +193,7 @@ async function testAuthCodes() {
 
 }
 
-async function testClosureDates() {
+async function testClosureDateSimple() {
     var client = null;
     var closureDateNow = Date.now()
     var closureDatePlus15S = closureDateNow + (1000 * 15)
@@ -203,17 +207,102 @@ async function testClosureDates() {
     await waitMS(17000)
     await tryPrintingSecretSpaceFor(client)
 
+
+    // test what happens on multiple closure Dates
+
+    
+
+
+
+}
+
+async function testClosureDateMany() {
+    var client0 = null;
+    var client1 = null;
+    var client2 = null;
+    var client3 = null;
+    var closureDateNow = Date.now()
+    var closureDatePlus15S = closureDateNow + (1000 * 15)
+    var closureDatePlus25S = closureDateNow + (1000 * 25)
+    var closureDatePlus222S = closureDateNow + (1000 * 222)
+
+    client0 = await tryCreating1ReadyClientWithClosureDate(closureDateNow)    
+    client1 = await tryCreating1ReadyClientWithClosureDate(closureDatePlus15S)
+    client2 = await tryCreating1ReadyClientWithClosureDate(closureDatePlus25S)
+    client3 = await tryCreating1ReadyClientWithClosureDate(closureDatePlus222S)
+
+    await tryPrintingSecretSpaceFor(client0)
+    await tryPrintingSecretSpaceFor(client1)
+    await tryPrintingSecretSpaceFor(client2)
+    await tryPrintingSecretSpaceFor(client3)
+
+    await waitMS(17000)
+
+    await tryPrintingSecretSpaceFor(client0)
+    await tryPrintingSecretSpaceFor(client1)
+    await tryPrintingSecretSpaceFor(client2)
+    await tryPrintingSecretSpaceFor(client3)
+
+    await waitMS(17000)
+
+    await tryPrintingSecretSpaceFor(client0)
+    await tryPrintingSecretSpaceFor(client1)
+    await tryPrintingSecretSpaceFor(client2)
+    await tryPrintingSecretSpaceFor(client3)
+
+    await waitMS(217000)
+
+    await tryPrintingSecretSpaceFor(client0)
+    await tryPrintingSecretSpaceFor(client1)
+    await tryPrintingSecretSpaceFor(client2)
+    await tryPrintingSecretSpaceFor(client3)
+
+}
+
+async function testClosureDateSubSpace() {
+    var client = null;
+    var sharer = null;
+
+    var closureDate = Date.now() + (1000 * 300)
+    var closureDateSubSpace = Date.now() + (1000 * 30)
+    client = await create1ReadyClient(closureDate)
+    sharer = await create1ReadyClient(closureDate)
+    
+    await client.acceptSecretsFrom(sharer.id, closureDateSubSpace)
+
+}
+
+async function testSecretSharing() {
+    var client = null;
+    var sharer = null;
+
+    var closureDate = Date.now() + (1000 * 30)
+    client = await create1ReadyClient(closureDate)
+    sharer = await create1ReadyClient(closureDate)
+    
+    await client.acceptSecretsFrom(sharer.id)
+
+    var secretId = "sharedSecret"
+    var secret = "Super Secret"
+    await sharer.shareSecretTo(client, secretId, secret)
+
+    var foundSecret = await client.getSecretFrom(sharer, secretId)
+    
+    if(foundSecret == secret) {
+        log("secret sharing successful!")
+    } else {
+        throw new Error("error ontestSecretSharing!\n foundSecret '"+foundSecret+"' did not match secret '"+secret+"'")
+    } 
 }
 
 async function testNotificationHooksSubSpace() {
     var client = null;
     var sharer = null;
 
-    var closureDate = Date.now() + (1000 * 10)
-
+    var closureDate = Date.now() + (1000 * 30)
     client = await create1ReadyClient(closureDate)
     sharer = await create1ReadyClient(closureDate)
-
+    
     await client.acceptSecretsFrom(sharer.id)
 
     await sharer.shareSecretTo(client, "sharedSecret", "Super Secret")
@@ -417,7 +506,7 @@ async function create1ReadyClient(closureDate, authCode) {
         if(authCode)
             options.authCode = authCode
 
-            var c = fac.createClient(options)
+        var c = fac.createClient(options)
         await c.ready
         return c
     } catch(error) {

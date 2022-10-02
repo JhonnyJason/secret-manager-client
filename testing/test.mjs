@@ -12,14 +12,16 @@ async function run() {
     // await testAuthCodes()
     // await testClosureSimple()
     // await testClosureDateMany()
-    await testClosureDateSubSpace()
+    // await testClosureDateSubSpace()
     // await testGetNodeId()
 
     // await testNotificationHooks1()
+    // await testNotificationHooks1Fail()
     // await testNotificationHooksAll()
     // await testNotificationHooksSubSpace()
     
     // await testSecretSharing()
+    await testSharingThenDenying()
 
     process.exit()
 
@@ -162,11 +164,6 @@ async function run() {
 
 }
 
-
-
-
-
-
 //==========================================================================
 //#region testcase
 async function testAuthCodes() {
@@ -206,13 +203,6 @@ async function testClosureDateSimple() {
 
     await waitMS(17000)
     await tryPrintingSecretSpaceFor(client)
-
-
-    // test what happens on multiple closure Dates
-
-    
-
-
 
 }
 
@@ -295,6 +285,35 @@ async function testSecretSharing() {
     } 
 }
 
+async function testSharingThenDenying() {
+    var client = null;
+    var sharer = null;
+
+    var closureDate = Date.now() + (1000 * 30)
+    client = await create1ReadyClient(closureDate)
+    sharer = await create1ReadyClient(closureDate)
+    
+    await client.acceptSecretsFrom(sharer.id)
+
+    var secretId = "sharedSecret"
+    var secret = "Super Secret"
+    await sharer.shareSecretTo(client, secretId, secret)
+
+    var foundSecret = await client.getSecretFrom(sharer, secretId)
+    
+    if(foundSecret == secret) {
+        log("secret sharing successful!")
+    } else {
+        throw new Error("error ontestSecretSharing!\n foundSecret '"+foundSecret+"' did not match secret '"+secret+"'")
+    }
+
+    await client.stopAcceptingSecretsFrom(sharer.id)
+
+
+    await sharer.shareSecretTo(client, secretId, secret)
+
+}
+
 async function testNotificationHooksSubSpace() {
     var client = null;
     var sharer = null;
@@ -344,6 +363,20 @@ async function testNotificationHooks1() {
     var type = "log"
     var targetId = "this"
     var notifyURL = "https://citysearch.weblenny.at/citysearch"
+    
+    var addResponse = await client.addNotificationHook(type, targetId, notifyURL)
+    olog({addResponse})
+}
+
+async function testNotificationHooks1Fail() {
+    var client = null;
+    var closureDate = Date.now() + (1000 * 20)
+
+    client = await create1ReadyClient(closureDate)
+
+    var type = "log"
+    var targetId = "this"
+    var notifyURL = "https://citysearch.weblenny.at/aafaf"
     
     var addResponse = await client.addNotificationHook(type, targetId, notifyURL)
     olog({addResponse})

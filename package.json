@@ -1,6 +1,6 @@
 {
     "name": "secret-manager-client",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "This is the shit!",
     "scripts": {
         "build-coffee": "coffee -o output/ -c sources/source/*/*.coffee",

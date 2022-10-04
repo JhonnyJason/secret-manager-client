@@ -1,10 +1,10 @@
 import * as fac from "../output/index.js"
 
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+// process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 //==========================================================================
 
-const serverURL = "https://secrets-dev"
+const serverURL = "https://secrets-dev.dotv.ee"
 const log = console.log
 function olog(arg) { log(JSON.stringify(arg, null, 4)) } 
 
@@ -533,7 +533,7 @@ async function printSecretFor(client, secretId) {
 async function create1ReadyClient(closureDate, authCode) {
     log("-> create1ReadyClient§")
     try {
-        var serverURL = "https://localhost:6999"
+        // var serverURL = "https://localhost:6999"
         var options = { serverURL }
 
         if(closureDate)
@@ -554,7 +554,7 @@ async function create1ReadyClient(closureDate, authCode) {
 async function tryCreating1ReadyClientWithClosureDate(closureDate) {
     log("-> tryCreate1ReadyClientWithClosureDate§")
     try {
-        var serverURL = "https://localhost:6999"
+        // var serverURL = "https://localhost:6999"
         var options = { serverURL, closureDate }
         var c = fac.createClient(options)
         await c.ready
@@ -568,7 +568,7 @@ async function tryCreating1ReadyClientWithClosureDate(closureDate) {
 async function create3Clients() {
     log("-> create3Clients§")
     try {
-        var serverURL = "https://localhost:6999"
+        // var serverURL = "https://localhost:6999"
         var options = { serverURL }
         var cA = fac.createClient(options)
         var cB = fac.createClient(options)
@@ -589,7 +589,7 @@ async function createClientInvalid() {
     const invalidB = "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeez"
     const authCode = "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
-    var serverURL = "https://localhost:6999"
+    // var serverURL = "https://localhost:6999"
     var options = { serverURL, authCode }
     options.secretKeyHex = valid
 

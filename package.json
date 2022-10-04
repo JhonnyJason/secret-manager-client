@@ -1,6 +1,6 @@
 {
     "name": "secret-manager-client",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "This is the shit!",
     "scripts": {
         "build-coffee": "coffee -o output/ -c sources/source/*/*.coffee",
@@ -26,7 +26,7 @@
         "initialize-thingy": "run-s -ns build",
         "copy-all-js": "cp sources/source/*/*.js output/",
         "build": "run-s -ns clean-package copy-all-js build-live build-coffee copyscript install-node-modules",
-        "watch": "run-p -nsr watch-live watch-coffee",
+        "watch": "run-p -nsr copy-all-js watch-live watch-coffee",
         "release": "run-s -ns build publish-script",
         "package-update-release": "run-s -ns update-tools update-packages inc-versions update-cli-packages push release",
         "inc-versions": "toolset/thingy-build-system/package/inc-versions.js",
@@ -51,7 +51,7 @@
     "dependencies": {
         "coffeescript": "^2.7.0",
         "livescript": "^1.6.0",
-        "npm-check-updates": "^16.3.4",
+        "npm-check-updates": "^16.3.8",
         "npm-run-all": "^4.1.5",
         "thingy-allmodules-sync": "^0.2.0",
         "thingy-module-gen": "^0.1.6",

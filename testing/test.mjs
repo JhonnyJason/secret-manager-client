@@ -3,13 +3,15 @@ import * as fac from "../output/index.js"
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 //==========================================================================
+
+const serverURL = "https://secrets-dev"
 const log = console.log
 function olog(arg) { log(JSON.stringify(arg, null, 4)) } 
 
 //==========================================================================
 async function run() {
 
-    // await testAuthCodes()
+    await testAuthCodes()
     // await testClosureSimple()
     // await testClosureDateMany()
     // await testClosureDateSubSpace()
@@ -21,7 +23,7 @@ async function run() {
     // await testNotificationHooksSubSpace()
     
     // await testSecretSharing()
-    await testSharingThenDenying()
+    // await testSharingThenDenying()
 
     process.exit()
 

@@ -173,7 +173,7 @@ async function testAuthCodes() {
     var publicAuthCode = "deadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabe"
     var serverId = null
     var authCode = null
-    var closureDate = Date.now() + (1000 * 10)
+    var closureDate = Date.now() + (1000 * 30)
 
 
     client = await create1ReadyClient(closureDate)
